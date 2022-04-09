@@ -14,26 +14,42 @@ l = l_b;
 OD_w = 80e-3;
 ID_w = 70e-3;
 t_w = 30e-3;
-rho_w = 6e3;
+rho_w = linspace(1e3,8e3);
 
 % Mass Properties
-[m_b, I_b] = inertia_hollow_cube(l_b,t_b,rho_b);
-[m_w, I_w] = inertia_wheel(OD_w,ID_w,t_w,rho_w);
+[m_b, I_b] = inertia_hollow_cube(l_b,t_b,rho_b)
+##[m_w, I_w] = inertia_wheel(OD_w,ID_w,t_w,rho_w);
+I_w = 1.907E-05;
+m_w = 0.075;
 
 % Required angular velocity to achieve flip, assuming perfect stop
-omega_w = sqrt( (2-sqrt(2)) .* ( I_w + I_b +m_w.*l.^2 ) ./ I_w.^2 .*
-  ( m_b.*l_b + m_w.*l ).*g );
+omega_w = sqrt( (2-sqrt(2)) .* ( I_w + I_b +m_w.*l.^2 ) ./ I_w.^2 .* ...
+  ( m_b.*l_b + m_w.*l ).*g ); 
 motor_rpm = omega_w ./ (2*pi) .* 60;
+
 fprintf('Motor Speed:\n%.2f rad/s\n%.2f RPM\n',omega_w,motor_rpm)
+##close all
+##figure
+##set(gca,"linewidth", 4, "fontsize", 12)
+##subplot(2,1,1)
+##plot(rho_w,motor_rpm)
+##grid on
+##xlabel('Flywheel Density (m^3/kg)')
+##ylabel('Motor RPM')
 
 % Motor Properties
-W = 200; % Motor Power
-KV = 1250; % Motor KV rating
+W = 375; % Motor Power
+KV = 1340; % Motor KV rating
 V = 11.1; % Voltage applied
 T = W./(KV .* V); % Motor Torque
 alpha_w = T./I_w; % Angular acceleration of flywheel
 t = omega_w./alpha_w; % Spin-up time
 fprintf('Spin-up Time:\n%.2f s\n',t)
+##subplot(2,1,2)
+##plot(rho_w,t)
+##grid on
+##xlabel('Flywheel Density (m^3/kg)')
+##ylabel('Spin-Up Time (s)')
 end
 
 function [m, I] = inertia_hollow_cube(L, t, rho)
